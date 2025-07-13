@@ -41,7 +41,7 @@ public class Renda {
   public static List<Renda> listarRenda() {
     return listaRendas;
   }
-
+  // Calculo da renda total
   public static double rendaTotalMensal(int mes, int ano) {
     double total = 0.0;
     for (Renda r : listaRendas) {
