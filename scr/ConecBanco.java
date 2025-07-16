@@ -1,3 +1,4 @@
+package scr;
 public class ConecBanco {
 
     private String url;
