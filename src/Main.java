@@ -30,7 +30,8 @@ public class Main {
 
     ConecBanco conecBanco = new ConecBanco("jdbc:postgresql://localhost:5432/Java", "postgres", "26042005");
     conecBanco.conectar();
-    
+    conecBanco.inserir("categoria", "nome_categoria", "'Alimentação'");
+    conecBanco.desconectar();
   }
 }
 
