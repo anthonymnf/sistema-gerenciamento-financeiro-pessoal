@@ -35,6 +35,7 @@ public class Main {
     conecBanco.deletar("categoria", "nome_categoria = 'Alimentação'");
 
     conecBanco.buscar("categoria", "nome_categoria", "id_categoria = 1");
+    conecBanco.atualizar("usuario", "nome = 'João', email = 'joao@gmail.com', data_nascimento = '1990-01-01'", "id_usuario = 1");
     conecBanco.buscar("usuario", "nome, email, data_nascimento", "id_usuario = 1");
     conecBanco.desconectar();
   }

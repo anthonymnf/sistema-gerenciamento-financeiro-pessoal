@@ -77,6 +77,18 @@ public class ConecBanco {
         }
     }
 
+    public void atualizar(String tabela, String atualizacoes, String condicao) {
+        String sql = "UPDATE " + tabela + " SET " + atualizacoes + " WHERE " + condicao;
+        try (Connection connection = DriverManager.getConnection(url, usuario, senha);
+             Statement statement = connection.createStatement()) {
+            statement.executeUpdate(sql);
+            System.out.println("Data updated successfully!");
+        } catch (SQLException e) {
+            System.out.println("Update failed!");
+            e.printStackTrace();
+        }
+    }
+
 
     public void desconectar() {
         try {
