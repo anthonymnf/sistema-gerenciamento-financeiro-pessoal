@@ -25,12 +25,6 @@ public class ConecBanco {
         }
     }
 
-    /*CREATE TABLE categoria (
-    id_categoria integer NOT NULL,
-    nome_categoria text NOT NULL,
-    CONSTRAINT categoria_pkey PRIMARY KEY (id_categoria)
-    ); */
-
     public void inserir(String tabela, String colunas, String valores) {
         String sql = "INSERT INTO " + tabela + " (" + colunas + ") VALUES (" + valores + ")";
         try (Connection connection = DriverManager.getConnection(url, usuario, senha);
@@ -39,6 +33,46 @@ public class ConecBanco {
             System.out.println("Data inserted successfully!");
         } catch (SQLException e) {
             System.out.println("Insertion failed!");
+            e.printStackTrace();
+        }
+    }
+
+    public void buscar(String tabela, String parametros, String condicao) {
+        if (condicao.isEmpty()) {
+            condicao = "1=1";
+        }
+        String sql = "SELECT " + parametros + " FROM " + tabela + " WHERE " + condicao + ";";
+        //System.err.println("Executing SQL: " + sql);
+
+        try (Connection connection = DriverManager.getConnection(url, usuario, senha);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql)) {
+
+            String[] param = parametros.split("\\s*,\\s*");
+
+            while (resultSet.next()) {
+                for (String p : param) {
+                    Object valor = resultSet.getObject(p);
+                    System.out.print(valor + " ");
+                }
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Search failed!");
+            e.printStackTrace();
+        }
+    }
+
+
+    public void deletar(String tabela, String condicao) {
+        String sql = "DELETE FROM " + tabela + " WHERE " + condicao;
+        try (Connection connection = DriverManager.getConnection(url, usuario, senha);
+             Statement statement = connection.createStatement()) {
+            statement.executeUpdate(sql);
+            System.out.println("deleted successfully!");
+        } catch (SQLException e) {
+            System.out.println("Deletion failed!");
             e.printStackTrace();
         }
     }
