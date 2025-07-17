@@ -1,4 +1,3 @@
-package scr;
 import java.util.Date;
 
 public class Main {
@@ -28,6 +27,10 @@ public class Main {
 
     double totalRenda = Renda.rendaTotalMensal(mesAtual, anoAtual);
     System.out.println("\nTotal de Renda no mês: R$ " + totalRenda);
+
+    ConecBanco conecBanco = new ConecBanco("jdbc:postgresql://localhost:5432/Java", "postgres", "26042005");
+    conecBanco.conectar();
+    
   }
 }
 
