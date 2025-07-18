@@ -1,4 +1,3 @@
-package scr;
 import java.util.Date;
 
 public class Main {
@@ -28,6 +27,17 @@ public class Main {
 
     double totalRenda = Renda.rendaTotalMensal(mesAtual, anoAtual);
     System.out.println("\nTotal de Renda no mês: R$ " + totalRenda);
+
+    ConecBanco conecBanco = new ConecBanco("jdbc:postgresql://localhost:5432/Java", "postgres", "26042005");
+    conecBanco.conectar();
+
+    conecBanco.inserir("categoria", "nome_categoria", "'Alimentação'");
+    conecBanco.deletar("categoria", "nome_categoria = 'Alimentação'");
+
+    conecBanco.buscar("categoria", "nome_categoria", "id_categoria = 1");
+    conecBanco.atualizar("usuario", "nome = 'João', email = 'joao@gmail.com', data_nascimento = '1990-01-01'", "id_usuario = 1");
+    conecBanco.buscar("usuario", "nome, email, data_nascimento", "id_usuario = 1");
+    conecBanco.desconectar();
   }
 }
 
