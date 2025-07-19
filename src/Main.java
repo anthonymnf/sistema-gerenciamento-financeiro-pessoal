@@ -2,13 +2,30 @@ import java.util.Date;
 
 public class Main {
   public static void main(String[] args) {
+    // Conexão com o banco
+    ConecBanco conecBanco = new ConecBanco("jdbc:postgresql://localhost:5432/Java", "postgres", "26042005");
+    conecBanco.conectar();
+
+    // Login
+    Usuario usuario = Usuario.login("Pedro@gmail.com", "05134447");
+    if (usuario != null) {
+      System.out.println("Usuário logado: " + usuario);
+    } else {
+      System.out.println("Falha no login.");
+    }
+
+    // Criando categoria (se necessário)
+    Categoria categoria = new Categoria("1", "Alimentação");
+
     // Criando algumas despesas
-    Despesa d1 = new Despesa("D001", "Aluguel", 1200.0, new Date());
-    Despesa d2 = new Despesa("D002", "Internet", 100.0, new Date());
+    Despesa d1 = new Despesa("D001", "Aluguel", 1200.0, new Date(), usuario, categoria, conecBanco);
+    Despesa d2 = new Despesa("D002", "Internet", 100.0, new Date(), usuario, categoria, conecBanco);
 
     // Criando algumas rendas
     Renda r1 = new Renda("R001", "Salário", 2500.0, new Date(), true);  // fixa
     Renda r2 = new Renda("R002", "Freela", 500.0, new Date(), false);   // extra
+    r1.salvarNoBanco();
+    r2.salvarNoBanco();
 
     // Listando tudo
     System.out.println("\n=== DESPESAS ===");
@@ -28,9 +45,7 @@ public class Main {
     double totalRenda = Renda.rendaTotalMensal(mesAtual, anoAtual);
     System.out.println("\nTotal de Renda no mês: R$ " + totalRenda);
 
-    ConecBanco conecBanco = new ConecBanco("jdbc:postgresql://localhost:5432/Java", "postgres", "26042005");
-    conecBanco.conectar();
-
+    // Operações de exemplo com o banco
     conecBanco.inserir("categoria", "nome_categoria", "'Alimentação'");
     conecBanco.deletar("categoria", "nome_categoria = 'Alimentação'");
 
@@ -38,24 +53,15 @@ public class Main {
     conecBanco.atualizar("usuario", "nome = 'João', email = 'joao@gmail.com', data_nascimento = '1990-01-01'", "id_usuario = 1");
     conecBanco.buscar("usuario", "nome, email, data_nascimento", "id_usuario = 1");
     conecBanco.buscar("usuario", "nome, email, data_nascimento", "nome = 'gqisah'");
-    //System.err.println(conecBanco.buscarBoolean("usuario", "email = 'Pedro@gmail.com' and senha = '05134447'"));
-    Usuario usuario = Usuario.login("email = Pedro@gmail.com", "senha = 05134447");
-    usuario = usuario.login("Pedro@gmail.com", "05134447");
-    if (usuario != null) {
-      System.out.println("Usuário logado: " + usuario);
+
+    // Outro teste de login
+    Usuario outroUsuario = Usuario.login("Peo@gmail.com", "034447");
+    if (outroUsuario != null) {
+      System.out.println("Usuário logado: " + outroUsuario);
     } else {
       System.out.println("Falha no login.");
     }
 
-    usuario = usuario.login("Peo@gmail.com", "034447");
-    if (usuario != null) {
-      System.out.println("Usuário logado: " + usuario);
-    } else {
-      System.out.println("Falha no login.");
-    }
-
-    System.err.println();
     conecBanco.desconectar();
   }
 }
-
