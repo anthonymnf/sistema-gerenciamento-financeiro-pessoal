@@ -5,40 +5,40 @@ public class Categoria {
   private String idCategoria;
   private String nomeCategoria;
 
-  // Lista estática para armazenar todas as categorias criadas
   private static List<Categoria> listaCategorias = new ArrayList<>();
 
-  // Construtor
-  public Categoria(String idCategoria, String nomeCategoria) {
+  public Categoria(String idCategoria, String nomeCategoria, ConecBanco banco) {
     this.idCategoria = idCategoria;
     this.nomeCategoria = nomeCategoria;
-
-    // Adiciona automaticamente à lista
     listaCategorias.add(this);
+
+    String tabela = "categoria";
+    String colunas = "id_categoria, nome_categoria";
+    String valores = "'" + idCategoria + "', '" + nomeCategoria + "'";
+    banco.inserir(tabela, colunas, valores);
   }
 
-  // Método para editar categoria
-  public boolean editarCategoria(String novoNome) {
+  public boolean editarCategoria(String novoNome, ConecBanco banco) {
     this.nomeCategoria = novoNome;
+    String atualizacoes = "nome_categoria = '" + novoNome + "'";
+    String condicao = "id_categoria = '" + idCategoria + "'";
+    banco.atualizar("categoria", atualizacoes, condicao);
     return true;
   }
 
-  // Método para excluir a categoria (remove da lista)
-  public boolean excluirCategoria() {
+  public boolean excluirCategoria(ConecBanco banco) {
+    banco.deletar("categoria", "id_categoria = '" + idCategoria + "'");
     return listaCategorias.remove(this);
   }
 
-  // Método para visualizar (retornar a própria categoria)
   public Categoria visualizarCategoria() {
     return this;
   }
 
-  // Método estático para listar todas as categorias
   public static List<Categoria> listarCategoria() {
     return listaCategorias;
   }
 
-  // Método estático para buscar uma categoria por ID
   public static Categoria buscarCategoria(String id) {
     for (Categoria c : listaCategorias) {
       if (c.getIdCategoria().equalsIgnoreCase(id)) {
@@ -48,7 +48,6 @@ public class Categoria {
     return null;
   }
 
-  // Getters
   public String getIdCategoria() {
     return idCategoria;
   }
@@ -57,12 +56,10 @@ public class Categoria {
     return nomeCategoria;
   }
 
-  // Setters
   public void setNomeCategoria(String nomeCategoria) {
     this.nomeCategoria = nomeCategoria;
   }
 
-  // Método toString para facilitar visualização
   @Override
   public String toString() {
     return "Categoria{" +

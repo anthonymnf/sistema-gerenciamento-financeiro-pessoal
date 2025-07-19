@@ -7,34 +7,50 @@ public class Despesa {
   private String nomeDespesa;
   private Double valor;
   private Date data;
+  private Usuario usuario;
+  private Categoria categoria;
 
-  // Lista estática para armazenar todas as instâncias de despesas
   private static List<Despesa> listaDespesas = new ArrayList<>();
 
-  public Despesa(String idDespesa, String nomeDespesa, Double valor, Date data) {
+  // Construtor
+  public Despesa(String idDespesa, String nomeDespesa, Double valor, Date data, Usuario usuario, Categoria categoria,
+      ConecBanco banco) {
     this.idDespesa = idDespesa;
     this.nomeDespesa = nomeDespesa;
     this.valor = valor;
     this.data = data;
+    this.usuario = usuario;
+    this.categoria = categoria;
 
     listaDespesas.add(this);
+
+    // Inserir no banco de dados
+    String tabela = "despesas";
+    String colunas = "id_despesas, id_usuario, data_inicio, data_fim";
+    String valores = "'" + idDespesa + "', '" + usuario.getIdUsuario() + "', '" + new java.sql.Date(data.getTime())
+        + "', '" + new java.sql.Date(data.getTime()) + "'";
+    banco.inserir(tabela, colunas, valores);
+
+    String tabelaIntermediaria = "categoriadespesas";
+    String colunasInter = "id_despesas, id_categoria";
+    String valoresInter = "'" + idDespesa + "', '" + categoria.getIdCategoria() + "'";
+    banco.inserir(tabelaIntermediaria, colunasInter, valoresInter);
   }
 
-  public boolean excluirDespesa() {
+  public boolean excluirDespesa(ConecBanco banco) {
+    banco.deletar("categoriadespesas", "id_despesas = '" + idDespesa + "'");
+    banco.deletar("despesas", "id_despesas = '" + idDespesa + "'");
     return listaDespesas.remove(this);
   }
 
-  // Visualizar a própria despesa
   public Despesa visualizarDespesa() {
     return this;
   }
 
-  // Listar todas as despesas
   public static List<Despesa> listarDespesa() {
     return listaDespesas;
   }
 
-  // Buscar despesa por ID (estático)
   public static Despesa buscarDespesa(String id) {
     for (Despesa d : listaDespesas) {
       if (d.getIdDespesa().equalsIgnoreCase(id)) {
@@ -44,12 +60,19 @@ public class Despesa {
     return null;
   }
 
-  public boolean editarDespesa(String novoNome, double novoValor, Date novaData) {
+  public boolean editarDespesa(String novoNome, double novoValor, Date novaData, ConecBanco banco) {
     this.nomeDespesa = novoNome;
     this.valor = novoValor;
     this.data = novaData;
+
+    String atualizacoes = "data_inicio = '" + new java.sql.Date(novaData.getTime()) + "', data_fim = '"
+        + new java.sql.Date(novaData.getTime()) + "'";
+    String condicao = "id_despesas = '" + idDespesa + "'";
+    banco.atualizar("despesas", atualizacoes, condicao);
     return true;
   }
+
+  // Getters e Setters
 
   public String getIdDespesa() {
     return idDespesa;
@@ -83,10 +106,30 @@ public class Despesa {
     this.data = data;
   }
 
-  @Override
-  public String toString() {
-    return "Despesa:\n-idDespesa: " + idDespesa + "\n- Nome da despesa: " + nomeDespesa + "\n- Valor: " + valor
-        + "\n- Data: " + data;
+  public Usuario getUsuario() {
+    return usuario;
   }
 
+  public void setUsuario(Usuario usuario) {
+    this.usuario = usuario;
+  }
+
+  public Categoria getCategoria() {
+    return categoria;
+  }
+
+  public void setCategoria(Categoria categoria) {
+    this.categoria = categoria;
+  }
+
+  @Override
+  public String toString() {
+    return "Despesa:\n" +
+        "- ID: " + idDespesa +
+        "\n- Nome: " + nomeDespesa +
+        "\n- Valor: " + valor +
+        "\n- Data: " + data +
+        "\n- Usuário: " + (usuario != null ? usuario.getNome() : "null") +
+        "\n- Categoria: " + (categoria != null ? categoria.getNomeCategoria() : "null");
+  }
 }
