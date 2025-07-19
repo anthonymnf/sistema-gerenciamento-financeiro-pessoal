@@ -1,5 +1,5 @@
 import java.sql.*;
-
+import java.util.ArrayList;
 public class ConecBanco {
 
     private String url;
@@ -62,6 +62,54 @@ public class ConecBanco {
             System.out.println("Search failed!");
             e.printStackTrace();
         }
+    }
+
+    public boolean buscarBoolean(String tabela, String condicao) {
+        if (condicao.isEmpty()) {
+            condicao = "1=1";
+        }
+
+        String sql = "SELECT 1 FROM " + tabela + " WHERE " + condicao + " LIMIT 1";
+
+        try (Connection connection = DriverManager.getConnection(url, usuario, senha);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql)) {
+
+            return resultSet.next();  // se existe pelo menos um resultado, retorna true
+
+        } catch (SQLException e) {
+            System.out.println("Search failed!");
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+
+    public ArrayList<Object> BuscarERetornar(String tabela, String parametros, String condicao) {
+        if (condicao.isEmpty()) {
+            condicao = "1=1";
+        }
+        String sql = "SELECT " + parametros + " FROM " + tabela + " WHERE " + condicao + " limit 1;";
+        
+        ArrayList<Object> resultados = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(url, usuario, senha);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql)) {
+            
+            String[] param = parametros.split("\\s*,\\s*");
+            if (resultSet.next()) {
+                for (String p : param) {
+                    Object valor = resultSet.getObject(p);
+                    resultados.add(valor != null ? valor.toString() : "");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Search failed!");
+            e.printStackTrace();
+        }
+        return resultados;
     }
 
 

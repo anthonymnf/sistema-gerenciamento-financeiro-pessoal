@@ -37,6 +37,24 @@ public class Main {
     conecBanco.buscar("categoria", "nome_categoria", "id_categoria = 1");
     conecBanco.atualizar("usuario", "nome = 'João', email = 'joao@gmail.com', data_nascimento = '1990-01-01'", "id_usuario = 1");
     conecBanco.buscar("usuario", "nome, email, data_nascimento", "id_usuario = 1");
+    conecBanco.buscar("usuario", "nome, email, data_nascimento", "nome = 'gqisah'");
+    //System.err.println(conecBanco.buscarBoolean("usuario", "email = 'Pedro@gmail.com' and senha = '05134447'"));
+    Usuario usuario = Usuario.login("email = Pedro@gmail.com", "senha = 05134447");
+    usuario = usuario.login("Pedro@gmail.com", "05134447");
+    if (usuario != null) {
+      System.out.println("Usuário logado: " + usuario);
+    } else {
+      System.out.println("Falha no login.");
+    }
+
+    usuario = usuario.login("Peo@gmail.com", "034447");
+    if (usuario != null) {
+      System.out.println("Usuário logado: " + usuario);
+    } else {
+      System.out.println("Falha no login.");
+    }
+
+    System.err.println();
     conecBanco.desconectar();
   }
 }
