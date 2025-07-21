@@ -1,4 +1,5 @@
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -44,13 +45,20 @@ public class Main {
         case 1:
           System.out.println("Descrição da despesa:");
           String descDesp = scanner.nextLine();
+
           System.out.println("Valor:");
           double valorDesp = scanner.nextDouble();
-          scanner.nextLine();
-          Date dataDesp = new Date();
-          Despesa novaDespesa = new Despesa(descDesp, valorDesp, dataDesp, usuario, "1", "1", conecBanco);
-          System.out.println("Despesa cadastrada.");
+          scanner.nextLine(); // consumir \n
+
+          System.out.println("ID da categoria:");
+          String idCategoria = scanner.nextLine();
+
+          Date dataDesp = new Date(); // pega data atual
+
+          Despesa novaDespesa = new Despesa(descDesp, valorDesp, dataDesp, usuario, idCategoria, "1", conecBanco);
+          System.out.println("Despesa cadastrada com sucesso.");
           break;
+
 
         case 2:
           System.out.println("Descrição da renda:");
@@ -86,13 +94,28 @@ public class Main {
           break;
 
         case 6:
-          System.out.println("Atualização de categoria (exemplo)");
-          conecBanco.atualizar("categoria", "nome_categoria = 'NovaCategoria'", "id_categoria = 1");
+          List<Despesa> despesas = Despesa.listarDespesas(conecBanco, usuario);
+          if (despesas.isEmpty()) {
+              System.out.println("Nenhuma despesa encontrada.");
+                } else {
+              for (Despesa d : despesas) {
+                  System.out.println(d);
+                  System.out.println("----------------------");
+                  }
+                }
           break;
 
         case 7:
-          System.out.println("Remoção de categoria (exemplo)");
-          conecBanco.deletar("categoria", "nome_categoria = 'NovaCategoria'");
+          Renda.carregarDoBanco(); // garante que está atualizada
+          List<Renda> rendas = Renda.listarRenda();
+          if (rendas.isEmpty()) {
+              System.out.println("Nenhuma renda encontrada.");
+          } else {
+              for (Renda r : rendas) {
+                  System.out.println(r);
+                  System.out.println("----------------------");
+              }
+          }
           break;
 
         case 8:
