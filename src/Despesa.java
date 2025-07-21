@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Despesa {
   private String idDespesa;
@@ -149,8 +150,13 @@ public class Despesa {
   for (int i = 0; i < resultados.size(); i += 7) {
     String id = (String) resultados.get(i);
     String nome = (String) resultados.get(i + 1);
-    Double valor = (Double) resultados.get(i + 2);
-    Date data = (Date) resultados.get(i + 3);
+    Double valor = Double.parseDouble(resultados.get(i + 2).toString());
+    Date data;
+    try {
+      data = java.sql.Date.valueOf(resultados.get(i + 3).toString());
+    } catch (Exception e) {
+      data = null;
+    }
     String idUsuario = (String) resultados.get(i + 4);
     String idCategoria = (String) resultados.get(i + 5);
     String idRelatorio = (String) resultados.get(i + 6);

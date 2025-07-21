@@ -75,8 +75,7 @@ public class Main {
 
         case 4:
           System.out.println("\n=== DESPESAS ===");
-          // Aqui você pode chamar um método que liste as despesas a partir do banco
-          System.out.println("Função de listar despesas ainda não implementada.");
+          conecBanco.buscar("despesas", "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio", "id_usuario = '" + usuario.getId_usuario() + "'");
           break;
 
         case 5:
