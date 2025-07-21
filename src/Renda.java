@@ -1,5 +1,3 @@
-package scr;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -27,6 +25,16 @@ public class Renda {
 
     public Renda(String idRenda, String nomeRenda, Double valor, Date data, boolean tipoRenda) {
         this.idRenda = idRenda;
+        this.nomeRenda = nomeRenda;
+        this.valor = valor;
+        this.data = data;
+        this.tipoRenda = tipoRenda;
+
+        listaRendas.add(this);
+    }
+
+    public Renda(String nomeRenda, Double valor, Date data, boolean tipoRenda) {
+        this.idRenda = String.valueOf(listaRendas.size() + 1); // Gera um ID simples baseado no tamanho da lista
         this.nomeRenda = nomeRenda;
         this.valor = valor;
         this.data = data;
@@ -105,7 +113,7 @@ public class Renda {
 
     // Salva esta renda no banco (insere ou atualiza)
     public boolean salvarNoBanco() {
-        String sqlInsert = "INSERT INTO renda (id_renda, nome_renda, valor, data, tipo_renda) VALUES (?, ?, ?, ?, ?)";
+        String sqlInsert = "INSERT INTO renda (nome_renda, valor, data, tipo_renda) VALUES (?, ?, ?, ?)";
         String sqlUpdate = "UPDATE renda SET nome_renda = ?, valor = ?, data = ?, tipo_renda = ? WHERE id_renda = ?";
 
         try (Connection con = DriverManager.getConnection(URL, USUARIO, SENHA)) {
@@ -127,7 +135,6 @@ public class Renda {
                 } else {
                     // Não existe, insere
                     try (PreparedStatement pstInsert = con.prepareStatement(sqlInsert)) {
-                        pstInsert.setInt(1, Integer.parseInt(idRenda));
                         pstInsert.setString(2, nomeRenda);
                         pstInsert.setDouble(3, valor);
                         pstInsert.setDate(4, new java.sql.Date(data.getTime()));

@@ -17,10 +17,10 @@ public class ConecBanco {
         try{
             Connection connection = DriverManager.getConnection(url, usuario, senha);
             if (connection != null) {
-                System.out.println("Connected to the database!");
+                System.out.println("Conectado ao banco!");
             }
         }catch (SQLException e) {
-            System.out.println("Connection failed!");
+            System.out.println("Conecção falhou!");
             e.printStackTrace();
         }
     }
@@ -78,7 +78,7 @@ public class ConecBanco {
             return resultSet.next();  // se existe pelo menos um resultado, retorna true
 
         } catch (SQLException e) {
-            System.out.println("Search failed!");
+            System.out.println("Nada encontrado na tabela " + tabela + " com a condição: " + condicao);
             e.printStackTrace();
         }
 
@@ -141,9 +141,9 @@ public class ConecBanco {
     public void desconectar() {
         try {
             DriverManager.getConnection(url, usuario, senha).close();
-            System.out.println("Disconnected from the database!");
+            System.out.println("Disconectado do banco!");
         } catch (SQLException e) {
-            System.out.println("Disconnection failed!");
+            System.out.println("Disconecção falhou!");
             e.printStackTrace();
         }
     }

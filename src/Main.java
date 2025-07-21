@@ -5,9 +5,9 @@ public class Main {
     // Conexão com o banco
     ConecBanco conecBanco = new ConecBanco("jdbc:postgresql://localhost:5432/Java", "postgres", "26042005");
     conecBanco.conectar();
-
+    
     // Login
-    Usuario usuario = Usuario.login("Pedro@gmail.com", "05134447");
+    Usuario usuario = Usuario.login("Pedro@gmail.com", "05134447", conecBanco);
     if (usuario != null) {
       System.out.println("Usuário logado: " + usuario);
     } else {
@@ -15,24 +15,20 @@ public class Main {
     }
 
     // Criando categoria (se necessário)
-    Categoria categoria = new Categoria("1", "Alimentação");
-
+    Categoria categoria = new Categoria("Jogos", conecBanco);
+    
     // Criando algumas despesas
-    Despesa d1 = new Despesa("D001", "Aluguel", 1200.0, new Date(), usuario, categoria, conecBanco);
-    Despesa d2 = new Despesa("D002", "Internet", 100.0, new Date(), usuario, categoria, conecBanco);
-
+    Despesa d1 = new Despesa("Almoço", 50.0, new Date(), new Date(), usuario, "4", conecBanco);
+    
     // Criando algumas rendas
-    Renda r1 = new Renda("R001", "Salário", 2500.0, new Date(), true);  // fixa
-    Renda r2 = new Renda("R002", "Freela", 500.0, new Date(), false);   // extra
+    Renda r1 = new Renda("Salário", 2500.0, new Date(), true);  // fixa
+    Renda r2 = new Renda("Freela", 500.0, new Date(), false);   // extra
     r1.salvarNoBanco();
-    r2.salvarNoBanco();
-
+    
     // Listando tudo
     System.out.println("\n=== DESPESAS ===");
-    for (Despesa d : Despesa.listarDespesa()) {
-      System.out.println(d);
-    }
-
+    d1.listarDespesas(conecBanco);
+     
     System.out.println("\n=== RENDAS ===");
     for (Renda r : Renda.listarRenda()) {
       System.out.println(r);
@@ -55,13 +51,13 @@ public class Main {
     conecBanco.buscar("usuario", "nome, email, data_nascimento", "nome = 'gqisah'");
 
     // Outro teste de login
-    Usuario outroUsuario = Usuario.login("Peo@gmail.com", "034447");
+    Usuario outroUsuario = Usuario.login("Peo@gmail.com", "034447", conecBanco);
     if (outroUsuario != null) {
       System.out.println("Usuário logado: " + outroUsuario);
     } else {
       System.out.println("Falha no login.");
     }
-
+    
     conecBanco.desconectar();
   }
 }

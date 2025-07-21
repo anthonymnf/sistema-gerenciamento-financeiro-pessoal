@@ -1,16 +1,23 @@
 import java.util.ArrayList;
-import java.util.List;
-
 public class Categoria {
-  private String idCategoria;
+
+
+  String idCategoria;
   private String nomeCategoria;
 
-  private static List<Categoria> listaCategorias = new ArrayList<>();
+  public Categoria(String nomeCategoria, ConecBanco banco) {
+
+    this.nomeCategoria = nomeCategoria;
+
+    String tabela = "categoria";
+    String colunas = "nome_categoria";
+    String valores = "'" + nomeCategoria + "'";
+    banco.inserir(tabela, colunas, valores);
+  }
 
   public Categoria(String idCategoria, String nomeCategoria, ConecBanco banco) {
     this.idCategoria = idCategoria;
     this.nomeCategoria = nomeCategoria;
-    listaCategorias.add(this);
 
     String tabela = "categoria";
     String colunas = "id_categoria, nome_categoria";
@@ -21,35 +28,31 @@ public class Categoria {
   public boolean editarCategoria(String novoNome, ConecBanco banco) {
     this.nomeCategoria = novoNome;
     String atualizacoes = "nome_categoria = '" + novoNome + "'";
-    String condicao = "id_categoria = '" + idCategoria + "'";
+    String condicao = "nome_categoria = '" + nomeCategoria + "'";
     banco.atualizar("categoria", atualizacoes, condicao);
     return true;
   }
 
-  public boolean excluirCategoria(ConecBanco banco) {
-    banco.deletar("categoria", "id_categoria = '" + idCategoria + "'");
-    return listaCategorias.remove(this);
+  public void excluirCategoria(ConecBanco banco) {
+    banco.deletar("categoria", "nome_categoria = '" + nomeCategoria + "'");
   }
 
   public Categoria visualizarCategoria() {
     return this;
   }
 
-  public static List<Categoria> listarCategoria() {
-    return listaCategorias;
+  public static void listarCategorias(ConecBanco banco) {
+    banco.buscar("categoria", "id_categoria, nome_categoria", "");
   }
 
-  public static Categoria buscarCategoria(String id) {
-    for (Categoria c : listaCategorias) {
-      if (c.getIdCategoria().equalsIgnoreCase(id)) {
-        return c;
-      }
+  public static Categoria buscarCategoria(ConecBanco banco, String idCategoria) {
+    ArrayList<Object> resultados = banco.BuscarERetornar("categoria", "id_categoria, nome_categoria", "id_categoria = '" + idCategoria + "'");
+    if (resultados.size() > 0) {
+      String id = (String) resultados.get(0);
+      String nome = (String) resultados.get(1);
+      return new Categoria(id, nome, banco);
     }
     return null;
-  }
-
-  public String getIdCategoria() {
-    return idCategoria;
   }
 
   public String getNomeCategoria() {
@@ -63,7 +66,6 @@ public class Categoria {
   @Override
   public String toString() {
     return "Categoria{" +
-        "id='" + idCategoria + '\'' +
         ", nome='" + nomeCategoria + '\'' +
         '}';
   }

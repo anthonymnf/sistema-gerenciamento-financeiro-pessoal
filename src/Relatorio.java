@@ -1,27 +1,29 @@
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
 public class Relatorio {
   private String idRelatorio;
   private Date data;
   private String horario;
   private Usuario usuario;
 
-  private static List<Relatorio> listaRelatorios = new ArrayList<>();
-
   public Relatorio(String idRelatorio, Date data, String horario, Usuario usuario, ConecBanco banco) {
     this.idRelatorio = idRelatorio;
     this.data = data;
     this.horario = horario;
     this.usuario = usuario;
-    listaRelatorios.add(this);
 
     String tabela = "relatorio";
     String colunas = "id_relatorio, id_usuario, data, horario";
-    String valores = "'" + idRelatorio + "', '" + usuario.getIdUsuario() + "', '" +
+    String valores = "'" + idRelatorio + "', '" + usuario.getId_usuario() + "', '" +
         new java.sql.Date(data.getTime()) + "', '" + horario + "'";
     banco.inserir(tabela, colunas, valores);
+  }
+
+  public Relatorio(String idRelatorio, Date data, String horario, Usuario usuario) {
+    this.idRelatorio = idRelatorio;
+    this.data = data;
+    this.horario = horario;
+    this.usuario = usuario;
   }
 
   public boolean editarRelatorio(Date novaData, String novoHorario, ConecBanco banco) {
@@ -34,24 +36,27 @@ public class Relatorio {
     return true;
   }
 
-  public boolean excluirRelatorio(ConecBanco banco) {
+  public void excluirRelatorio(ConecBanco banco) {
     banco.deletar("relatorio", "id_relatorio = '" + idRelatorio + "'");
-    return listaRelatorios.remove(this);
   }
 
   public Relatorio visualizarRelatorio() {
     return this;
   }
 
-  public static List<Relatorio> listarRelatorio() {
-    return listaRelatorios;
+  public static void listarRelatorios(ConecBanco banco) {
+    banco.buscar("relatorio", "id_relatorio, data, horario, id_usuario", "");
   }
 
-  public static Relatorio buscarRelatorio(String id) {
-    for (Relatorio r : listaRelatorios) {
-      if (r.getIdRelatorio().equalsIgnoreCase(id)) {
-        return r;
-      }
+  public static Relatorio buscarRelatorio(String id, ConecBanco banco) {
+    ArrayList<Object> resultados = banco.BuscarERetornar("relatorio", "id_relatorio, data, horario, id_usuario", "id_relatorio = '" + id + "'");
+    if (resultados.size() > 0) {
+      String idRelatorio = (String) resultados.get(0);
+      Date data = (Date) resultados.get(1);
+      String horario = (String) resultados.get(2);
+      String idUsuario = (String) resultados.get(3);
+      Usuario usuario = Usuario.login(idUsuario, "", banco); // Assuming login method can fetch user by ID
+      return new Relatorio(idRelatorio, data, horario, usuario);
     }
     return null;
   }
