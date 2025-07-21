@@ -18,7 +18,7 @@ public class Main {
     Categoria categoria = new Categoria("Jogos", conecBanco);
     
     // Criando algumas despesas
-    Despesa d1 = new Despesa("Almoço", 50.0, new Date(), new Date(), usuario, "4", conecBanco);
+    Despesa d1 = new Despesa("Aluguel", 1200.0, new Date(), usuario, "6", "6", conecBanco);
     
     // Criando algumas rendas
     Renda r1 = new Renda("Salário", 2500.0, new Date(), true);  // fixa
@@ -27,7 +27,7 @@ public class Main {
     
     // Listando tudo
     System.out.println("\n=== DESPESAS ===");
-    d1.listarDespesas(conecBanco);
+    //d1.listarDespesas(conecBanco);
      
     System.out.println("\n=== RENDAS ===");
     for (Renda r : Renda.listarRenda()) {

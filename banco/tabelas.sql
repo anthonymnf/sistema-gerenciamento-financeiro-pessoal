@@ -15,12 +15,16 @@ CREATE TABLE despesas (
   id_despesas SERIAL NOT NULL,
   id_usuario integer NOT NULL,
   id_categoria integer NOT NULL,
-  data_inicio date NOT NULL,
-  data_fim date NOT NULL,
+  id_relatorio integer NOT NULL,
+  data date NOT NULL,
+  valor double precision NOT NULL,
+  nome_despesa text NOT NULL,
   CONSTRAINT despesas_pkey PRIMARY KEY (id_despesas),
   FOREIGN KEY (id_usuario) REFERENCES usuario on update cascade on delete cascade,
   FOREIGN KEY (id_categoria) REFERENCES categoria on update cascade on delete cascade
+  FOREIGN KEY (id_relatorio) REFERENCES relatorio on update cascade on delete cascade
 );
+
 CREATE TABLE relatorio (
   id_relatorio SERIAL NOT NULL,
   id_usuario integer NOT NULL,

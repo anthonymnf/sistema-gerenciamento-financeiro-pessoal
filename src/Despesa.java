@@ -4,31 +4,32 @@ import java.util.Date;
 public class Despesa {
   private String idDespesa;
   private String nomeDespesa;
-  private Date dataInicio;
-  private Date dataFim;
+  private Date data;
   private Usuario usuario;
   private String idCategoria;
+  private String idRelatorio;
+  private Double valor;
 
   // Construtor
-  public Despesa(String nomeDespesa, Double valor, Date dataI, Date dataF, Usuario usuario, String idCategoria, ConecBanco banco) {
-
+  public Despesa(String nomeDespesa, Double valor, Date data, Usuario usuario, String idCategoria, String idRelatorio, ConecBanco banco) {
     this.nomeDespesa = nomeDespesa;
-    this.dataInicio = dataI;
-    this.dataFim = dataF;
+    this.valor = valor;
+    this.data = data;
     this.usuario = usuario;
     this.idCategoria = idCategoria;
+    this.idRelatorio = idRelatorio;
 
     // Inserir no banco de dados
     String tabela = "despesas";
-    String colunas = "id_usuario, id_categoria, data_inicio, data_fim";
-    String valores = "'" + usuario.getId_usuario() + "', '" + idCategoria + "', '" + new java.sql.Date(dataInicio.getTime())
-        + "', '" + new java.sql.Date(dataFim.getTime()) + "'";
+    String colunas = "nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio";
+    String valores = "'" + nomeDespesa + "', " + valor + ", '" + new java.sql.Date(data.getTime()) + "', '" +
+        usuario.getId_usuario() + "', '" + idCategoria + "', '" + idRelatorio + "'";
 
-    System.err.println("sql: " + tabela + ", " + colunas + ", " + valores);
     banco.inserir(tabela, colunas, valores);
 
-    ArrayList<Object> resultados = banco.BuscarERetornar("despesas", "id_despesas", "id_usuario = '" + usuario.getId_usuario()  + "' and id_categoria = '" + idCategoria + "'" + 
-        " and data_inicio = '" + new java.sql.Date(dataInicio.getTime()) + "' and data_fim = '" + new java.sql.Date(dataFim.getTime()) + "'");
+    ArrayList<Object> resultados = banco.BuscarERetornar("despesas", "id_despesas", 
+      "nome_despesa = '" + nomeDespesa + "' and valor = " + valor + " and data = '" + new java.sql.Date(data.getTime()) +
+      "' and id_usuario = '" + usuario.getId_usuario() + "' and id_categoria = '" + idCategoria + "' and id_relatorio = '" + idRelatorio + "'");
 
     if (resultados.size() > 0) {
       this.idDespesa = (String) resultados.get(0);
@@ -36,23 +37,19 @@ public class Despesa {
       System.out.println("Erro ao inserir despesa no banco de dados.");
       return;
     }
-
-    String tabelaIntermediaria = "categoriadespesas";
-    String colunasInter = "id_despesas, id_categoria";
-    String valoresInter = "'" + idDespesa + "', '" + idCategoria + "'";
-    banco.inserir(tabelaIntermediaria, colunasInter, valoresInter);
   }
 
-  public Despesa(String idDespesa, Usuario usuario, String idCategoria, Date dataInicio, Date dataFim) {
+  public Despesa(String idDespesa, String nomeDespesa, Double valor, Date data, Usuario usuario, String idCategoria, String idRelatorio) {
     this.idDespesa = idDespesa;
+    this.nomeDespesa = nomeDespesa;
+    this.valor = valor;
+    this.data = data;
     this.usuario = usuario;
     this.idCategoria = idCategoria;
-    this.dataInicio = dataInicio;
-    this.dataFim = dataFim; 
+    this.idRelatorio = idRelatorio;
   }
 
   public void excluirDespesa(ConecBanco banco) {
-    banco.deletar("categoriadespesas", "id_despesas = '" + idDespesa + "'");
     banco.deletar("despesas", "id_despesas = '" + idDespesa + "'");
   }
 
@@ -61,38 +58,36 @@ public class Despesa {
   }
 
   public static void listarDespesas(ConecBanco banco) {
-    
-    banco.buscar("despesas", "id_despesas, id_usuario, id_categoria, data_inicio, data_fim", "");
+    banco.buscar("despesas", "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio", "");
   }
 
   public static Despesa buscarDespesa(ConecBanco banco, String id, Usuario usuario) {
-    
-    ArrayList<Object> resultados = banco.BuscarERetornar("despesas", "id_despesas, id_usuario, id_categoria, data_inicio, data_fim", "id_despesas = '" + id + "'");
-    
+    ArrayList<Object> resultados = banco.BuscarERetornar("despesas", "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio", "id_despesas = '" + id + "'");
     if (resultados.size() > 0) {
       String idDespesa = (String) resultados.get(0);
-      String idCategoria = (String) resultados.get(2);
-      Date dataInicio = (Date) resultados.get(3);
-      Date dataFim = (Date) resultados.get(4);
-      return new Despesa(idDespesa, usuario, idCategoria, dataInicio, dataFim);
+      String nomeDespesa = (String) resultados.get(1);
+      Double valor = (Double) resultados.get(2);
+      Date data = (Date) resultados.get(3);
+      String idCategoria = (String) resultados.get(5);
+      String idRelatorio = (String) resultados.get(6);
+      return new Despesa(idDespesa, nomeDespesa, valor, data, usuario, idCategoria, idRelatorio);
     }
     return null;
   }
 
-  public boolean editarDespesa(String novoNome, Date novaDataInicio, Date novaDataFim, ConecBanco banco) {
+  public boolean editarDespesa(String novoNome, Double novoValor, Date novaData, String novaCategoria, String novoRelatorio, ConecBanco banco) {
     this.nomeDespesa = novoNome;
-    this.dataInicio = novaDataInicio;
-    this.dataFim = novaDataFim;
+    this.valor = novoValor;
+    this.data = novaData;
+    this.idCategoria = novaCategoria;
+    this.idRelatorio = novoRelatorio;
 
-    String atualizacoes = "data_inicio = '" + new java.sql.Date(
-      novaDataFim.getTime()) + "', data_fim = '"
-        + new java.sql.Date(dataFim.getTime()) + "'";
+    String atualizacoes = "nome_despesa = '" + novoNome + "', valor = " + novoValor + ", data = '" + new java.sql.Date(novaData.getTime()) +
+      "', id_categoria = '" + novaCategoria + "', id_relatorio = '" + novoRelatorio + "'";
     String condicao = "id_despesas = '" + idDespesa + "'";
     banco.atualizar("despesas", atualizacoes, condicao);
     return true;
   }
-
-  // Getters e Setters
 
   public String getIdDespesa() {
     return idDespesa;
@@ -110,6 +105,22 @@ public class Despesa {
     this.nomeDespesa = nomeDespesa;
   }
 
+  public Double getValor() {
+    return valor;
+  }
+
+  public void setValor(Double valor) {
+    this.valor = valor;
+  }
+
+  public Date getData() {
+    return data;
+  }
+
+  public void setData(Date data) {
+    this.data = data;
+  }
+
   public String getCategoria() {
     return idCategoria;
   }
@@ -123,9 +134,10 @@ public class Despesa {
     return "Despesa:\n" +
         "- ID: " + idDespesa +
         "\n- Nome: " + nomeDespesa +
-        "\n- Data Inicio: " + dataInicio +
-        "\n- Data Fim: " + dataFim +
+        "\n- Valor: " + valor +
+        "\n- Data: " + data +
         "\n- Usuário: " + (usuario != null ? usuario.getNome() : "null") +
-        "\n- Categoria: " + idCategoria;
+        "\n- Categoria: " + idCategoria +
+        "\n- Relatório: " + idRelatorio;
   }
 }
