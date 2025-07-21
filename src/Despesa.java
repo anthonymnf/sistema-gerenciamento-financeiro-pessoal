@@ -140,4 +140,45 @@ public class Despesa {
         "\n- Categoria: " + idCategoria +
         "\n- Relatório: " + idRelatorio;
   }
+
+  public static List<Despesa> listarDespesas(ConecBanco banco, Usuario usuario) {
+  List<Despesa> lista = new ArrayList<>();
+  ArrayList<Object> resultados = banco.BuscarERetornar("despesas",
+      "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio", "");
+
+  for (int i = 0; i < resultados.size(); i += 7) {
+    String id = (String) resultados.get(i);
+    String nome = (String) resultados.get(i + 1);
+    Double valor = (Double) resultados.get(i + 2);
+    Date data = (Date) resultados.get(i + 3);
+    String idUsuario = (String) resultados.get(i + 4);
+    String idCategoria = (String) resultados.get(i + 5);
+    String idRelatorio = (String) resultados.get(i + 6);
+
+    // Só adiciona despesas do usuário logado
+    if (usuario != null && usuario.getId_usuario().equals(idUsuario)) {
+      lista.add(new Despesa(id, nome, valor, data, usuario, idCategoria, idRelatorio));
+    }
+  }
+
+  return lista;
+}
+
+public static double despesaTotalMensal(int mes, int ano, ConecBanco banco, Usuario usuario) {
+  double total = 0.0;
+  List<Despesa> despesas = listarDespesas(banco, usuario);
+
+  for (Despesa d : despesas) {
+    Date data = d.getData();
+    int mesDesp = data.getMonth() + 1;
+    int anoDesp = data.getYear() + 1900;
+
+    if (mesDesp == mes && anoDesp == ano) {
+      total += d.getValor();
+    }
+  }
+
+  return total;
+}
+
 }
