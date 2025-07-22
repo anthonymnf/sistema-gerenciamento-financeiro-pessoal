@@ -11,11 +11,50 @@ public class Main {
     conecBanco.conectar();
     
     // Login
+    System.err.println("=== LOGIN E CADASTRO ===");
+    System.out.print("1 -- Login\n2 - Cadastro\nEscolha uma opção: ");
+    int opcaoLogin = scanner.nextInt();
+    scanner.nextLine(); // limpar o buffer
+    String email = "";
+    String senha = "";
+    if (opcaoLogin == 2) {
+      System.out.println("=== CADASTRO ===");
+      System.out.print("Nome: ");
+      String nome = scanner.nextLine();
+      System.err.println("CPF: (apenas números)");
+      String cpf = scanner.nextLine();
+      System.out.print("Email: ");
+      email = scanner.nextLine();
+      System.out.print("Senha: ");
+      senha = scanner.nextLine();
+      System.out.print("Data de Nascimento (dd/MM/yyyy): ");
+      String dataNascimentoStr = scanner.nextLine();
+      Date dataNascimento = null;
+      try {
+        dataNascimento = new SimpleDateFormat("dd/MM/yyyy").parse(dataNascimentoStr);
+      } catch (java.text.ParseException e) {
+        System.out.println("Data inválida! Use o formato dd/MM/yyyy.");
+        conecBanco.desconectar();
+        scanner.close();
+        return;
+      }
+
+
+      conecBanco.inserir("usuario", "nome, cpf, email, senha, data_nascimento", "'" + nome + "', '" + cpf + "', '" + email + "', '" + senha + "', '" + new java.sql.Date(dataNascimento.getTime()) + "'");
+      System.out.println("Usuário cadastrado com sucesso!");
+    } else if (opcaoLogin != 1) {
+      System.out.println("Opção inválida. Encerrando o sistema.");
+      conecBanco.desconectar();
+      scanner.close();
+      return;
+    }
+
+
     System.out.println("=== LOGIN ===");
     System.out.print("Email: ");
-    String email = scanner.nextLine();
+    email = scanner.nextLine();
     System.out.print("Senha: ");
-    String senha = scanner.nextLine();
+    senha = scanner.nextLine();
 
     Usuario usuario = Usuario.login(email, senha, conecBanco);
 
