@@ -74,7 +74,8 @@ public class Main {
       System.out.println("4 - Exibir despesas cadastradas");
       System.err.println("5 - despesas por categoria");
       System.out.println("6 - Exibir relatório do mês atual");
-      System.out.println("7 - Novo login");
+      System.err.println("7 - Relatorio de despesas e rendas");
+      System.out.println("8 - Novo login");
       System.out.println("0 - Sair");
       System.out.print("Escolha uma opção: ");
       opcao = scanner.nextInt();
@@ -109,7 +110,7 @@ public class Main {
             break;
           }
 
-          new Despesa(descDesp, valorDesp, dataDesp, usuario, idCategoria, "1", conecBanco);
+          new Despesa(descDesp, valorDesp, dataDesp, usuario, idCategoria, conecBanco);
           System.out.println("Despesa cadastrada com sucesso.");
           break;
 
@@ -144,7 +145,7 @@ public class Main {
 
         case 4:
           System.out.println("\n=== DESPESAS ===");
-          conecBanco.buscar("despesas", "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio", "id_usuario = '" + usuario.getId_usuario() + "'");
+          conecBanco.buscar("despesas", "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria", "id_usuario = '" + usuario.getId_usuario() + "'");
           break;
 
         case 5:
@@ -152,7 +153,7 @@ public class Main {
           System.out.println("a categoria:");
           String categoria = scanner.nextLine();
           String idcategoria = conecBanco.BuscarERetornar("categoria", "id_categoria", "nome_categoria = '" + categoria + "'").get(0).toString();
-          conecBanco.buscar("despesas", "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio", "id_categoria = '" + idcategoria + "' and id_usuario = '" + usuario.getId_usuario() + "'");
+          conecBanco.buscar("despesas", "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria", "id_categoria = '" + idcategoria + "' and id_usuario = '" + usuario.getId_usuario() + "'");
           break;
 
         case 6:
@@ -170,8 +171,21 @@ public class Main {
           System.out.println("Saldo Final: R$ " + saldoFinal);
           break;
 
-
         case 7:
+          System.out.println("\n=== RELATÓRIO DE DESPESAS E RENDAS ===");
+          System.err.println("digite o mês (1-12)");
+          int mes = scanner.nextInt();
+          System.err.println("digite o ano (ex: 2023)");
+          int ano = scanner.nextInt();
+          double totalRendaGeral = Renda.rendaTotalMensal(mes, ano, conecBanco, usuario);
+          double totalDespesasGeral = Despesa.despesaTotalMensal(mes, ano, conecBanco, usuario);
+          double saldoGeral = totalRendaGeral - totalDespesasGeral;
+          System.out.println("Total de Renda Geral: R$ " + totalRendaGeral);
+          System.out.println("Total de Despesas Geral: R$ " + totalDespesasGeral);
+          System.out.println("Saldo Geral: R$ " + saldoGeral);
+          break;
+
+        case 8:
           System.out.println("\n--- NOVO LOGIN ---");
           System.out.print("Email: ");
           email = scanner.nextLine();
