@@ -72,11 +72,9 @@ public class Main {
       System.out.println("2 - Cadastrar nova renda");
       System.out.println("3 - Exibir rendas cadastradas");
       System.out.println("4 - Exibir despesas cadastradas");
-      System.out.println("5 - Inserir nova categoria");
-      System.out.println("6 - Atualizar categoria");
-      System.out.println("7 - Excluir categoria");
-      System.out.println("8 - Exibir relatório do mês atual");
-      System.out.println("9 - Novo login");
+      System.err.println("5 - despesas por categoria");
+      System.out.println("6 - Exibir relatório do mês atual");
+      System.out.println("7 - Novo login");
       System.out.println("0 - Sair");
       System.out.print("Escolha uma opção: ");
       opcao = scanner.nextInt();
@@ -91,10 +89,25 @@ public class Main {
           double valorDesp = scanner.nextDouble();
           scanner.nextLine(); // consumir \n
 
-          System.out.println("ID da categoria:");
+          System.out.println("categoria:");
           String idCategoria = scanner.nextLine();
 
-          Date dataDesp = new Date(); // pega data atual
+          if (!conecBanco.buscarBoolean("categoria", "nome_categoria = '" + idCategoria + "'")) {
+            new Categoria(idCategoria, conecBanco);
+            idCategoria = conecBanco.BuscarERetornar("categoria", "id_categoria", "nome_categoria = '" + idCategoria + "'").get(0).toString();
+          } else{
+            idCategoria = conecBanco.BuscarERetornar("categoria", "id_categoria", "nome_categoria = '" + idCategoria + "'").get(0).toString();
+          }
+
+          Date dataDesp = null;
+          System.out.println("Data (dd/MM/yyyy):");
+          String dataStrDesp = scanner.nextLine();
+          try {
+            dataDesp = new SimpleDateFormat("dd/MM/yyyy").parse(dataStrDesp);
+          } catch (java.text.ParseException e) {
+            System.out.println("Data inválida! Use o formato dd/MM/yyyy.");
+            break;
+          }
 
           new Despesa(descDesp, valorDesp, dataDesp, usuario, idCategoria, "1", conecBanco);
           System.out.println("Despesa cadastrada com sucesso.");
@@ -135,29 +148,14 @@ public class Main {
           break;
 
         case 5:
-          System.out.print("Nome da nova categoria: ");
-          String nomeCat = scanner.nextLine();
-          new Categoria(nomeCat, conecBanco);
-          System.out.println("Categoria inserida.");
+          System.out.println("\n=== DESPESAS POR CATEGORIA ===");
+          System.out.println("a categoria:");
+          String categoria = scanner.nextLine();
+          String idcategoria = conecBanco.BuscarERetornar("categoria", "id_categoria", "nome_categoria = '" + categoria + "'").get(0).toString();
+          conecBanco.buscar("despesas", "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio", "id_categoria = '" + idcategoria + "' and id_usuario = '" + usuario.getId_usuario() + "'");
           break;
 
         case 6:
-          System.out.print("ID da categoria a ser atualizada: ");
-          String idCat = scanner.nextLine();
-          System.out.print("Novo nome da categoria: ");
-          String novoNomeCat = scanner.nextLine();
-          Categoria.atualizarCategoria(idCat, novoNomeCat, conecBanco);
-          System.out.println("Categoria atualizada.");
-          break;
-
-        case 7:
-          System.out.print("Nome da categoria a ser excluída: ");
-          String idCatExcluir = scanner.nextLine();
-          Categoria.excluirCategoria(idCatExcluir, conecBanco);
-          System.out.println("Categoria excluída.");
-          break;
-
-        case 8:
           int mesAtual = new Date().getMonth() + 1;
           int anoAtual = new Date().getYear() + 1900;
 
@@ -173,7 +171,7 @@ public class Main {
           break;
 
 
-        case 9:
+        case 7:
           System.out.println("\n--- NOVO LOGIN ---");
           System.out.print("Email: ");
           email = scanner.nextLine();
