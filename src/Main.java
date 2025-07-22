@@ -1,5 +1,5 @@
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -21,6 +21,8 @@ public class Main {
 
     if (usuario == null) {
       System.out.println("Falha no login. Encerrando o sistema.");
+      conecBanco.desconectar();
+      scanner.close();
       return;
     }
 
@@ -55,7 +57,7 @@ public class Main {
 
           Date dataDesp = new Date(); // pega data atual
 
-          Despesa novaDespesa = new Despesa(descDesp, valorDesp, dataDesp, usuario, idCategoria, "1", conecBanco);
+          new Despesa(descDesp, valorDesp, dataDesp, usuario, idCategoria, "1", conecBanco);
           System.out.println("Despesa cadastrada com sucesso.");
           break;
 
@@ -69,16 +71,23 @@ public class Main {
           System.out.println("É fixa? (true/false):");
           boolean isFixa = scanner.nextBoolean();
           scanner.nextLine();
-          Renda novaRenda = new Renda(descRenda, valorRenda, new Date(), isFixa);
-          novaRenda.salvarNoBanco();
+          System.out.println("Data (dd/MM/yyyy):");
+          String dataStr = scanner.nextLine();
+          Date dataRenda = null;
+          try {
+            dataRenda = new SimpleDateFormat("dd/MM/yyyy").parse(dataStr);
+          } catch (java.text.ParseException e) {
+            System.out.println("Data inválida! Use o formato dd/MM/yyyy.");
+            break;
+          }
+
+          new Renda(descRenda, valorRenda, dataRenda, isFixa, usuario, conecBanco);
           System.out.println("Renda cadastrada.");
           break;
 
         case 3:
           System.out.println("\n=== RENDAS CADASTRADAS ===");
-          for (Renda r : Renda.listarRenda()) {
-            System.out.println(r);
-          }
+          Renda.listarRenda(conecBanco, usuario);
           break;
 
         case 4:
@@ -89,40 +98,31 @@ public class Main {
         case 5:
           System.out.print("Nome da nova categoria: ");
           String nomeCat = scanner.nextLine();
-          Categoria novaCategoria = new Categoria(nomeCat, conecBanco);
+          new Categoria(nomeCat, conecBanco);
           System.out.println("Categoria inserida.");
           break;
 
         case 6:
-          List<Despesa> despesas = Despesa.listarDespesas(conecBanco, usuario);
-          if (despesas.isEmpty()) {
-              System.out.println("Nenhuma despesa encontrada.");
-                } else {
-              for (Despesa d : despesas) {
-                  System.out.println(d);
-                  System.out.println("----------------------");
-                  }
-                }
+          System.out.print("ID da categoria a ser atualizada: ");
+          String idCat = scanner.nextLine();
+          System.out.print("Novo nome da categoria: ");
+          String novoNomeCat = scanner.nextLine();
+          Categoria.atualizarCategoria(idCat, novoNomeCat, conecBanco);
+          System.out.println("Categoria atualizada.");
           break;
 
         case 7:
-          Renda.carregarDoBanco(); // garante que está atualizada
-          List<Renda> rendas = Renda.listarRenda();
-          if (rendas.isEmpty()) {
-              System.out.println("Nenhuma renda encontrada.");
-          } else {
-              for (Renda r : rendas) {
-                  System.out.println(r);
-                  System.out.println("----------------------");
-              }
-          }
+          System.out.print("Nome da categoria a ser excluída: ");
+          String idCatExcluir = scanner.nextLine();
+          Categoria.excluirCategoria(idCatExcluir, conecBanco);
+          System.out.println("Categoria excluída.");
           break;
 
         case 8:
           int mesAtual = new Date().getMonth() + 1;
           int anoAtual = new Date().getYear() + 1900;
 
-          double totalRenda = Renda.rendaTotalMensal(mesAtual, anoAtual);
+          double totalRenda = Renda.rendaTotalMensal(mesAtual, anoAtual, conecBanco, usuario);
           double totalDespesas = Despesa.despesaTotalMensal(mesAtual, anoAtual, conecBanco, usuario);
           double saldoFinal = totalRenda - totalDespesas;
 

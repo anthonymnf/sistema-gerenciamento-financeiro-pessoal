@@ -99,8 +99,8 @@ public class ConecBanco {
             
             String[] param = parametros.split("\\s*,\\s*");
             if (resultSet.next()) {
-                for (String p : param) {
-                    Object valor = resultSet.getObject(p);
+                for (int i = 0; i < param.length; i++) {
+                    Object valor = resultSet.getObject(i + 1);  // <<< Usa o índice ao invés do nome
                     resultados.add(valor != null ? valor.toString() : "");
                 }
             }
@@ -111,6 +111,7 @@ public class ConecBanco {
         }
         return resultados;
     }
+
 
 
     public void deletar(String tabela, String condicao) {

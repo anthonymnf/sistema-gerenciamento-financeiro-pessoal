@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class Despesa {
   private String idDespesa;
@@ -12,7 +11,8 @@ public class Despesa {
   private Double valor;
 
   // Construtor
-  public Despesa(String nomeDespesa, Double valor, Date data, Usuario usuario, String idCategoria, String idRelatorio, ConecBanco banco) {
+  public Despesa(String nomeDespesa, Double valor, Date data, Usuario usuario, String idCategoria, String idRelatorio,
+      ConecBanco banco) {
     this.nomeDespesa = nomeDespesa;
     this.valor = valor;
     this.data = data;
@@ -28,9 +28,11 @@ public class Despesa {
 
     banco.inserir(tabela, colunas, valores);
 
-    ArrayList<Object> resultados = banco.BuscarERetornar("despesas", "id_despesas", 
-      "nome_despesa = '" + nomeDespesa + "' and valor = " + valor + " and data = '" + new java.sql.Date(data.getTime()) +
-      "' and id_usuario = '" + usuario.getId_usuario() + "' and id_categoria = '" + idCategoria + "' and id_relatorio = '" + idRelatorio + "'");
+    ArrayList<Object> resultados = banco.BuscarERetornar("despesas", "id_despesas",
+        "nome_despesa = '" + nomeDespesa + "' and valor = " + valor + " and data = '"
+            + new java.sql.Date(data.getTime()) +
+            "' and id_usuario = '" + usuario.getId_usuario() + "' and id_categoria = '" + idCategoria
+            + "' and id_relatorio = '" + idRelatorio + "'");
 
     if (resultados.size() > 0) {
       this.idDespesa = (String) resultados.get(0);
@@ -40,7 +42,8 @@ public class Despesa {
     }
   }
 
-  public Despesa(String idDespesa, String nomeDespesa, Double valor, Date data, Usuario usuario, String idCategoria, String idRelatorio) {
+  public Despesa(String idDespesa, String nomeDespesa, Double valor, Date data, Usuario usuario, String idCategoria,
+      String idRelatorio) {
     this.idDespesa = idDespesa;
     this.nomeDespesa = nomeDespesa;
     this.valor = valor;
@@ -63,7 +66,8 @@ public class Despesa {
   }
 
   public static Despesa buscarDespesa(ConecBanco banco, String id, Usuario usuario) {
-    ArrayList<Object> resultados = banco.BuscarERetornar("despesas", "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio", "id_despesas = '" + id + "'");
+    ArrayList<Object> resultados = banco.BuscarERetornar("despesas",
+        "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio", "id_despesas = '" + id + "'");
     if (resultados.size() > 0) {
       String idDespesa = (String) resultados.get(0);
       String nomeDespesa = (String) resultados.get(1);
@@ -76,15 +80,17 @@ public class Despesa {
     return null;
   }
 
-  public boolean editarDespesa(String novoNome, Double novoValor, Date novaData, String novaCategoria, String novoRelatorio, ConecBanco banco) {
+  public boolean editarDespesa(String novoNome, Double novoValor, Date novaData, String novaCategoria,
+      String novoRelatorio, ConecBanco banco) {
     this.nomeDespesa = novoNome;
     this.valor = novoValor;
     this.data = novaData;
     this.idCategoria = novaCategoria;
     this.idRelatorio = novoRelatorio;
 
-    String atualizacoes = "nome_despesa = '" + novoNome + "', valor = " + novoValor + ", data = '" + new java.sql.Date(novaData.getTime()) +
-      "', id_categoria = '" + novaCategoria + "', id_relatorio = '" + novoRelatorio + "'";
+    String atualizacoes = "nome_despesa = '" + novoNome + "', valor = " + novoValor + ", data = '"
+        + new java.sql.Date(novaData.getTime()) +
+        "', id_categoria = '" + novaCategoria + "', id_relatorio = '" + novoRelatorio + "'";
     String condicao = "id_despesas = '" + idDespesa + "'";
     banco.atualizar("despesas", atualizacoes, condicao);
     return true;
@@ -142,49 +148,22 @@ public class Despesa {
         "\n- Relatório: " + idRelatorio;
   }
 
-  public static List<Despesa> listarDespesas(ConecBanco banco, Usuario usuario) {
-  List<Despesa> lista = new ArrayList<>();
-  ArrayList<Object> resultados = banco.BuscarERetornar("despesas",
-      "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio", "");
+  public static void listarDespesas(ConecBanco banco, Usuario usuario) {
 
-  for (int i = 0; i < resultados.size(); i += 7) {
-    String id = (String) resultados.get(i);
-    String nome = (String) resultados.get(i + 1);
-    Double valor = Double.parseDouble(resultados.get(i + 2).toString());
-    Date data;
-    try {
-      data = java.sql.Date.valueOf(resultados.get(i + 3).toString());
-    } catch (Exception e) {
-      data = null;
-    }
-    String idUsuario = (String) resultados.get(i + 4);
-    String idCategoria = (String) resultados.get(i + 5);
-    String idRelatorio = (String) resultados.get(i + 6);
-
-    // Só adiciona despesas do usuário logado
-    if (usuario != null && usuario.getId_usuario().equals(idUsuario)) {
-      lista.add(new Despesa(id, nome, valor, data, usuario, idCategoria, idRelatorio));
-    }
+    banco.buscar("despesas", "id_despesas, nome_despesa, valor, data, id_usuario, id_categoria, id_relatorio",
+        "id_usuario = '" + usuario.getId_usuario() + "'");
   }
 
-  return lista;
-}
+  public static double despesaTotalMensal(int mes, int ano, ConecBanco banco, Usuario usuario) {
 
-public static double despesaTotalMensal(int mes, int ano, ConecBanco banco, Usuario usuario) {
-  double total = 0.0;
-  List<Despesa> despesas = listarDespesas(banco, usuario);
+    String mesStr = String.format("%02d", mes);
+    String condicao = "id_usuario = '" + usuario.getId_usuario() + "' AND TO_CHAR(data, 'YYYY-MM') = '" + ano + "-" + mesStr + "'";
+    ArrayList<Object> resultados = banco.BuscarERetornar("despesas", "SUM(valor)", condicao);
 
-  for (Despesa d : despesas) {
-    Date data = d.getData();
-    int mesDesp = data.getMonth() + 1;
-    int anoDesp = data.getYear() + 1900;
-
-    if (mesDesp == mes && anoDesp == ano) {
-      total += d.getValor();
+    if (resultados.size() > 0 && resultados.get(0) != null && !resultados.get(0).toString().isEmpty()) {
+      return Double.parseDouble(resultados.get(0).toString());
     }
+    return 0.0;
   }
-
-  return total;
-}
 
 }

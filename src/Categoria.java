@@ -45,6 +45,10 @@ public class Categoria {
     banco.buscar("categoria", "id_categoria, nome_categoria", "");
   }
 
+  public static void excluirCategoria(String nome, ConecBanco banco) {
+    banco.deletar("categoria", "nome_categoria = '" + nome + "'");
+  }
+
   public static Categoria buscarCategoria(ConecBanco banco, String idCategoria) {
     ArrayList<Object> resultados = banco.BuscarERetornar("categoria", "id_categoria, nome_categoria", "id_categoria = '" + idCategoria + "'");
     if (resultados.size() > 0) {
@@ -53,6 +57,13 @@ public class Categoria {
       return new Categoria(id, nome, banco);
     }
     return null;
+  }
+
+  public static boolean atualizarCategoria(String idCategoria, String novoNome, ConecBanco banco) {
+    String atualizacoes = "nome_categoria = '" + novoNome + "'";
+    String condicao = "id_categoria = '" + idCategoria + "'";
+    banco.atualizar("categoria", atualizacoes, condicao);
+    return true;
   }
 
   public String getNomeCategoria() {
