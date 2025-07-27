@@ -7,7 +7,7 @@ public class Main {
     Scanner scanner = new Scanner(System.in);
 
     // Conexão com o banco
-    ConecBanco conecBanco = new ConecBanco("jdbc:postgresql://localhost:5432/Java", "postgres", "26042005");
+    ConecBanco conecBanco = new ConecBanco("jdbc:postgresql://localhost:5432/financeiro", "postgres", "26042005");
     conecBanco.conectar();
     
     // Login
